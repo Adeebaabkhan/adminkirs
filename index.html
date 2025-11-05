@@ -427,6 +427,47 @@
             font-size: 0.95em;
         }
 
+        /* Admin List Info Box */
+        .admin-info {
+            background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+            border: 3px solid #0EA5E9;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .admin-info-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #0369A1;
+            margin-bottom: 15px;
+        }
+
+        .admin-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .admin-item {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #0369A1;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-item span:first-child {
+            font-size: 1.3em;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .login-header h1 {
@@ -478,6 +519,32 @@
         <form class="login-form" id="loginForm">
             <div class="welcome-message" id="welcomeMessage"></div>
             <div class="error-message" id="errorMessage"></div>
+
+            <!-- Admin Info Box -->
+            <div class="admin-info">
+                <div class="admin-info-header">
+                    <span>👥</span>
+                    <span data-translate="adminListTitle">Available Admin Accounts</span>
+                </div>
+                <div class="admin-list">
+                    <div class="admin-item">
+                        <span>👤</span>
+                        <span><strong>kirs</strong> - abdkirs</span>
+                    </div>
+                    <div class="admin-item">
+                        <span>👤</span>
+                        <span><strong>admin</strong> - admin123</span>
+                    </div>
+                    <div class="admin-item">
+                        <span>👤</span>
+                        <span><strong>manager</strong> - manager456</span>
+                    </div>
+                    <div class="admin-item">
+                        <span>👤</span>
+                        <span><strong>sales</strong> - sales789</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-group">
                 <label for="username" data-translate="usernameLabel">👤 Username</label>
@@ -539,9 +606,28 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // User database
+        // 👥 USER DATABASE WITH 4 ADMIN ACCOUNTS
         const users = {
-            'kirs': { password: 'abdkirs', name: 'kirs', role: 'admin' }
+            'kirs': { 
+                password: 'abdkirs', 
+                name: 'Kirs', 
+                role: 'admin' 
+            },
+            'admin': { 
+                password: 'admin123', 
+                name: 'Admin', 
+                role: 'admin' 
+            },
+            'manager': { 
+                password: 'manager456', 
+                name: 'Manager', 
+                role: 'admin' 
+            },
+            'sales': { 
+                password: 'sales789', 
+                name: 'Sales Lead', 
+                role: 'admin' 
+            }
         };
 
         // Translations
@@ -549,6 +635,7 @@
             en: {
                 appTitle: "Maison Étoile",
                 appSubtitle: "Sales Tracker System",
+                adminListTitle: "Available Admin Accounts",
                 usernameLabel: "👤 Username",
                 usernamePlaceholder: "Enter your username",
                 passwordLabel: "🔒 Password",
@@ -566,6 +653,7 @@
             ph: {
                 appTitle: "Maison Étoile",
                 appSubtitle: "Sistema ng Sales Tracker",
+                adminListTitle: "Mga Available na Admin Account",
                 usernameLabel: "👤 Username",
                 usernamePlaceholder: "Ilagay ang iyong username",
                 passwordLabel: "🔒 Password",
@@ -772,13 +860,13 @@
                         localStorage.removeItem('rememberMe');
                     }
 
-                    // ⭐ FIX: Save ALL required session storage variables
+                    // ⭐ Save ALL required session storage variables
                     // First set (original variables)
                     sessionStorage.setItem('currentUser', username);
                     sessionStorage.setItem('userName', users[username].name);
                     sessionStorage.setItem('userRole', users[username].role);
                     
-                    // Second set (dashboard required variables) - THIS WAS MISSING!
+                    // Second set (dashboard required variables)
                     sessionStorage.setItem('salesTrackerLoggedIn', 'true');
                     sessionStorage.setItem('salesTrackerUser', username);
                     sessionStorage.setItem('salesTrackerName', users[username].name);

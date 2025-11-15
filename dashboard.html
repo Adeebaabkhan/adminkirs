@@ -2032,14 +2032,10 @@ body.dark-mode .profile-select-btn {
         <div id="profileSelectGrid" class="profile-select-grid"></div>
     </div>
 </div>
-                <!-- Sold Status -->
-                <div class="form-group">
-                    <label>📦 Status</label>
-                    <select id="productSoldStatus" required>
-                        <option value="no">In Stock</option>
-                        <option value="yes">Sold</option>
-                    </select>
-                </div>
+<!-- Status (Always Sold - Hidden) -->
+<div class="form-group" style="display: none;">
+    <input type="hidden" id="productSoldStatus" value="yes">
+</div>
 
                 <button type="submit" class="btn btn-primary">➕ ADD SALE</button>
             </form>

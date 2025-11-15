@@ -4149,8 +4149,10 @@ document.querySelectorAll('input[name="saleType"]').forEach(radio => {
             document.getElementById('totalEarningsCard').style.display = 'block';
         }
 
-// Delete Sale (Fixed for bulk-added sales and admin sales)
+// DELETE SALE - FIXED FOR OWNER DELETING ADMIN SALES
 function deleteSale(saleId) {
+    console.log('🔍 Delete called for sale:', saleId);
+    
     const saleRef = getRef(`sales/${currentSession.id}/${saleId}`);
     
     saleRef.once('value').then((snapshot) => {
@@ -4160,59 +4162,76 @@ function deleteSale(saleId) {
             return;
         }
 
+        console.log('📦 Sale data:', sale);
+        
+        // Get creator info
         const saleCreatorId = sale.userId;
         const saleCreatorRole = sale.userRole;
         const currentUserId = currentSession.id;
         const currentUserRole = currentSession.role;
 
-        console.log('Sale creator:', saleCreatorId, saleCreatorRole);
-        console.log('Current user:', currentUserId, currentUserRole);
+        console.log('👤 Sale creator:', saleCreatorId, saleCreatorRole);
+        console.log('🎯 Current user:', currentUserId, currentUserRole);
 
-        // Check permissions
+        // FIXED PERMISSION CHECK - OWNER CAN DELETE ADMIN SALES
         let canDelete = false;
 
         if (currentUserRole === 'owner') {
-            // Owner can delete ANY sale (their own, admin sales, user sales)
+            // ✅ OWNER: Can delete ANY sale (admin sales, user sales, own sales)
             canDelete = true;
+            console.log('✅ Owner permission granted - can delete any sale');
         } 
         else if (currentUserRole === 'admin') {
-            // Admin can delete their own sales AND other admin's sales
-            canDelete = (saleCreatorId === currentUserId) || (saleCreatorRole === 'admin');
+            // ✅ ADMIN: Can delete their own sales ONLY
+            canDelete = (saleCreatorId === currentUserId);
+            console.log('🔧 Admin permission:', canDelete);
         } 
         else {
-            // Users can only delete their OWN sales
-            canDelete = saleCreatorId === currentUserId;
+            // ✅ USER: Can delete their own sales ONLY
+            canDelete = (saleCreatorId === currentUserId);
+            console.log('👤 User permission:', canDelete);
         }
 
         if (!canDelete) {
-            showToast('❌ You do not have permission to delete this sale', 'error');
+            const errorMsg = `🚫 Permission Denied!\nYour Role: ${currentUserRole}\nSale Creator: ${saleCreatorRole || 'Unknown'}`;
+            alert(errorMsg);
+            showToast('❌ You cannot delete this sale', 'error');
             return;
         }
 
-        // Ask for confirmation before deletion
-        if (!confirm('Are you sure you want to delete this sale?')) return;
+        // CONFIRM DELETION
+        if (!confirm(`🗑️ Delete this sale?\nProduct: ${sale.product}\nBuyer: ${sale.buyerUsername}`)) {
+            return;
+        }
 
-        // Delete the sale from Firebase
+        // DELETE FROM FIREBASE
         saleRef.remove()
             .then(() => {
-                showToast('🗑️ Sale deleted successfully', 'success');
+                console.log('✅ Sale deleted from Firebase');
                 
-                // Remove the sale row from the UI
+                // SUCCESS MESSAGE
+                alert('✅ Sale deleted successfully!');
+                showToast('🗑️ Sale deleted', 'success');
+                
+                // REMOVE FROM UI
                 const saleRow = document.getElementById(`sale-${saleId}`);
                 if (saleRow) {
                     saleRow.remove();
+                    console.log('✅ Removed from UI');
+                } else {
+                    console.log('🔄 Row not found, refreshing table...');
+                    updateUI(); // Refresh entire table
                 }
-                
-                // Refresh sales table
-                updateUI();
             })
             .catch((error) => {
-                console.error('Error deleting sale:', error);
-                showToast('❌ Error deleting sale: ' + error.message, 'error');
+                console.error('❌ Firebase error:', error);
+                alert('❌ Delete failed: ' + error.message);
+                showToast('❌ Error deleting sale', 'error');
             });
     }).catch((error) => {
-        console.error('Error fetching sale:', error);
-        showToast('❌ Error: ' + error.message, 'error');
+        console.error('❌ Fetch error:', error);
+        alert('❌ Error: ' + error.message);
+        showToast('❌ Error fetching sale', 'error');
     });
 }
         // Edit Product
